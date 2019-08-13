@@ -615,7 +615,6 @@ function computeLegendDimensions(gd, groups, traces) {
         }
     }
 
-    // make sure we're only getting full pixels
     opts._width = Math.ceil(opts._width);
     opts._height = Math.ceil(opts._height);
 
@@ -650,7 +649,6 @@ function expandMargin(gd) {
         yanchor = 'middle';
     }
 
-    // lastly check if the margin auto-expand has changed
     Plots.autoMargin(gd, 'legend', {
         x: opts.x,
         y: opts.y,
