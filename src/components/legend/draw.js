@@ -99,6 +99,7 @@ module.exports = function draw(gd) {
             // It requires the legend width, height, x and y to position the scrollbox
             // and these values are mutated in repositionLegend.
             var gs = fullLayout._size;
+            var bw = opts.borderwidth;
 
             var lx = gs.l + gs.w * opts.x;
             if(Lib.isRightAnchor(opts)) {
@@ -154,19 +155,19 @@ module.exports = function draw(gd) {
             if(opts._height <= legendHeight || gd._context.staticPlot) {
                 // if scrollbar should not be shown.
                 bg.attr({
-                    width: legendWidth - opts.borderwidth,
-                    height: legendHeight - opts.borderwidth,
-                    x: opts.borderwidth / 2,
-                    y: opts.borderwidth / 2
+                    width: legendWidth - bw,
+                    height: legendHeight - bw,
+                    x: bw / 2,
+                    y: bw / 2
                 });
 
                 Drawing.setTranslate(scrollBox, 0, 0);
 
                 clipPath.select('rect').attr({
-                    width: legendWidth - 2 * opts.borderwidth,
-                    height: legendHeight - 2 * opts.borderwidth,
-                    x: opts.borderwidth,
-                    y: opts.borderwidth
+                    width: legendWidth - 2 * bw,
+                    height: legendHeight - 2 * bw,
+                    x: bw,
+                    y: bw
                 });
 
                 Drawing.setClipUrl(scrollBox, clipId, gd);
@@ -188,22 +189,22 @@ module.exports = function draw(gd) {
                 // by the scrollbar width and margin
                 bg.attr({
                     width: legendWidth -
-                        2 * opts.borderwidth +
+                        2 * bw +
                         constants.scrollBarWidth +
                         constants.scrollBarMargin,
-                    height: legendHeight - opts.borderwidth,
-                    x: opts.borderwidth / 2,
-                    y: opts.borderwidth / 2
+                    height: legendHeight - bw,
+                    x: bw / 2,
+                    y: bw / 2
                 });
 
                 clipPath.select('rect').attr({
                     width: legendWidth -
-                        2 * opts.borderwidth +
+                        2 * bw +
                         constants.scrollBarWidth +
                         constants.scrollBarMargin,
-                    height: legendHeight - 2 * opts.borderwidth,
-                    x: opts.borderwidth,
-                    y: opts.borderwidth + scrollBoxY
+                    height: legendHeight - 2 * bw,
+                    x: bw,
+                    y: bw + scrollBoxY
                 });
 
                 Drawing.setClipUrl(scrollBox, clipId, gd);
