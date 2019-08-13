@@ -95,30 +95,18 @@ module.exports = function draw(gd) {
         function() { return computeLegendDimensions(gd, groups, traces); },
         function() { return expandMargin(gd); },
         function() {
-            // Position and size the legend
-            var lxMin = 0;
-            var lxMax = fullLayout.width;
-            var lyMin = 0;
-            var lyMax = fullLayout.height;
-
             // Scroll section must be executed after repositionLegend.
             // It requires the legend width, height, x and y to position the scrollbox
             // and these values are mutated in repositionLegend.
             var gs = fullLayout._size;
-            var lx = gs.l + gs.w * opts.x;
-            var ly = gs.t + gs.h * (1 - opts.y);
 
+            var lx = gs.l + gs.w * opts.x;
             if(Lib.isRightAnchor(opts)) {
                 lx -= opts._width;
             } else if(Lib.isCenterAnchor(opts)) {
                 lx -= opts._width / 2;
             }
 
-            if(Lib.isBottomAnchor(opts)) {
-                ly -= opts._height;
-            } else if(Lib.isMiddleAnchor(opts)) {
-                ly -= opts._height / 2;
-            }
 
             // Make sure the legend left and right sides are visible
             var legendWidth = opts._width;
@@ -128,9 +116,16 @@ module.exports = function draw(gd) {
                 lx = gs.l;
                 legendWidth = legendWidthMax;
             } else {
-                if(lx + legendWidth > lxMax) lx = lxMax - legendWidth;
-                if(lx < lxMin) lx = lxMin;
-                legendWidth = Math.min(lxMax - lx, opts._width);
+                if(lx + legendWidth > fullLayout.width) lx = fullLayout.width - legendWidth;
+                if(lx < 0) lx = 0;
+                legendWidth = Math.min(fullLayout.width - lx, opts._width);
+            }
+
+            var ly = gs.t + gs.h * (1 - opts.y);
+            if(Lib.isBottomAnchor(opts)) {
+                ly -= opts._height;
+            } else if(Lib.isMiddleAnchor(opts)) {
+                ly -= opts._height / 2;
             }
 
             // Make sure the legend top and bottom are visible
@@ -143,9 +138,9 @@ module.exports = function draw(gd) {
                 ly = gs.t;
                 legendHeight = legendHeightMax;
             } else {
-                if(ly + legendHeight > lyMax) ly = lyMax - legendHeight;
-                if(ly < lyMin) ly = lyMin;
-                legendHeight = Math.min(lyMax - ly, opts._height);
+                if(ly + legendHeight > fullLayout.height) ly = fullLayout.height - legendHeight;
+                if(ly < 0) ly = 0;
+                legendHeight = Math.min(fullLayout.height - ly, opts._height);
             }
 
             // Set size and position of all the elements that make up a legend:
