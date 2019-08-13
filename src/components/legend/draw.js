@@ -619,11 +619,8 @@ function computeLegendDimensions(gd, groups, traces) {
     opts._width = Math.ceil(opts._width);
     opts._height = Math.ceil(opts._height);
 
-    var isEditable = (
-        gd._context.edits.legendText ||
-        gd._context.edits.legendPosition
-    );
-
+    var edits = gd._context.edits;
+    var isEditable = edits.legendText || edits.legendPosition;
     traces.each(function(d) {
         var h = d[0].height;
         Drawing.setRect(d3.select(this).select('.legendtoggle'),
