@@ -95,9 +95,6 @@ module.exports = function draw(gd) {
         function() { return computeLegendDimensions(gd, groups, traces); },
         function() { return expandMargin(gd); },
         function() {
-            // Scroll section must be executed after repositionLegend.
-            // It requires the legend width, height, x and y to position the scrollbox
-            // and these values are mutated in repositionLegend.
             var gs = fullLayout._size;
             var bw = opts.borderwidth;
 
