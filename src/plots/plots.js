@@ -1820,8 +1820,14 @@ plots.autoMargin = function(gd, id, o) {
 
             // if the item is too big, just give it enough automargin to
             // make sure you can still grab it and bring it back
-            if(o.l + o.r > fullLayout.width * 0.5) o.l = o.r = 0;
-            if(o.b + o.t > fullLayout.height * 0.5) o.b = o.t = 0;
+            if(o.l + o.r > fullLayout.width * 0.5) {
+                o.l = o.r = 0;
+                console.log('Too big in X')
+            }
+            if(o.b + o.t > fullLayout.height * 0.5) {
+                o.b = o.t = 0;
+                console.log('Too big in Y')
+            }
 
             var xl = o.xl !== undefined ? o.xl : o.x;
             var xr = o.xr !== undefined ? o.xr : o.x;
@@ -1949,6 +1955,7 @@ plots.didMarginChange = function(margin0, margin1) {
         // use 1px tolerance in case we old/new differ only
         // by rounding errors, which can lead to infinite loops
         if(!isNumeric(m0) || Math.abs(m1 - m0) > 1) {
+            console.log('Margin changed', margin0, '-->', margin1)
             return true;
         }
     }
