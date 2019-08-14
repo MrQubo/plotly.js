@@ -98,6 +98,7 @@ module.exports = function getLegendData(calcdata, opts) {
     }
 
     // number of legend groups - needed in legend/draw.js
+    // TODO no need for this one, groups.size() should do the job
     opts._lgroupsLength = lgroupsLength;
     // maximum name/label length - needed in legend/draw.js
     opts._maxNameLength = maxNameLength;
