@@ -146,7 +146,7 @@ function render(scene) {
             pointNumber: ptNumber
         };
 
-        Fx.appendArrayPointValue(pointData, traceNow, ptNumber);
+        Lib.appendArrayPointValue(pointData, traceNow, ptNumber);
 
         if(trace._module.eventData) {
             pointData = traceNow._module.eventData(pointData, selection, traceNow, {}, ptNumber);
