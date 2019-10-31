@@ -61,6 +61,13 @@ module.exports = function handleAxisDefaults(containerIn, containerOut, coerce, 
     coerce('range');
     containerOut.cleanRange();
 
+    var bounds = coerce('bounds');
+    var boundmodeDflt = '';
+    if(bounds && (bounds[0] || bounds[1])) {
+        boundmodeDflt = 'autorange+interaction';
+    }
+    coerce('boundmode', boundmodeDflt);
+
     handleCategoryOrderDefaults(containerIn, containerOut, coerce, options);
 
     if(axType !== 'category' && !options.noHover) coerce('hoverformat');

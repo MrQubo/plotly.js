@@ -242,6 +242,9 @@ function handleCartesian(gd, ev) {
                         r0 * rangeNow[0] + r1 * rangeNow[1],
                         r0 * rangeNow[1] + r1 * rangeNow[0]
                     ];
+                    if(ax.boundmode.indexOf('interaction') !== -1) {
+                        rangeNew = Lib.clampRangeToBounds(rangeNew, ax.bounds);
+                    }
 
                     aobj[axName + '.range[0]'] = ax.l2r(rangeNew[0]);
                     aobj[axName + '.range[1]'] = ax.l2r(rangeNew[1]);

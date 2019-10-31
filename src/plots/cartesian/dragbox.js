@@ -551,6 +551,7 @@ function makeDragBox(gd, plotinfo, x, y, w, h, ns, ew) {
                 dragAxList(yaxes, dy);
                 updateMatchedAxRange('y');
             }
+            // TODO: What to do with subplots when bounds take effect?
             updateSubplots([xActive ? -dx : 0, yActive ? -dy : 0, pw, ph]);
             ticksAndAnnotations();
             gd.emit('plotly_relayouting', updates);
@@ -1002,11 +1003,16 @@ function zoomAxRanges(axList, r0Fraction, r1Fraction, updates, linkedAxes) {
 function dragAxList(axList, pix) {
     for(var i = 0; i < axList.length; i++) {
         var axi = axList[i];
+
         if(!axi.fixedrange) {
             axi.range = [
                 axi.l2r(axi._rl[0] - pix / axi._m),
                 axi.l2r(axi._rl[1] - pix / axi._m)
             ];
+        }
+
+        if(axi.boundmode.indexOf('interaction') !== -1) {
+            axi.range = Lib.clampRangeToBounds(axi.range, axi.bounds);
         }
     }
 }

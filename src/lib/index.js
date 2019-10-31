@@ -1210,3 +1210,56 @@ lib.getTextTransform = function(opts) {
 
     return transformTranslate + transformScale + transformRotate;
 };
+
+/**
+ * Clamps a given range to the bounds specified.
+ * @param {array} range to clamp to the bounds.
+ * @param {array} bounds to clamp to.
+ * @return {array} clamped range, where limits are
+ *     always inside bounds. range size is maintained, unless
+ *     bigger than bounds size.
+ */
+lib.clampRangeToBounds = function(range, bounds) {
+    if(!bounds) {
+        return range;
+    }
+
+    var r0 = range[0];
+    var r1 = range[1];
+    var b0 = bounds[0];
+    var b1 = bounds[1];
+    var reversed = r0 > r1;
+
+    if(reversed) {
+        var tmp = r1;
+        r1 = r0;
+        r0 = tmp;
+        tmp = b1;
+        b1 = b0;
+        b0 = tmp;
+    }
+
+    var dr = r1 - r0;
+    var hasB0 = b0 || b0 === 0;
+    var hasB1 = b1 || b1 === 0;
+
+    if(hasB0 && hasB1) {
+        var db = b1 - b0;
+        if(dr >= db) {
+            return bounds.slice();
+        }
+    }
+
+    if(hasB0 && r0 < b0) {
+        r1 = b0 + dr;
+        r0 = b0;
+    } else if(hasB1 && r1 > b1) {
+        r0 = b1 - dr;
+        r1 = b1;
+    }
+
+    if(reversed) {
+        return [r1, r0];
+    }
+    return [r0, r1];
+};
