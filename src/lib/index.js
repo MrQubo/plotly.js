@@ -633,14 +633,108 @@ lib.getTargetArray = function(trace, transformOpts) {
     var target = transformOpts.target;
 
     if(typeof target === 'string' && target) {
-        var array = lib.nestedProperty(trace, target).get();
-        return Array.isArray(array) ? array : false;
+        var array = [];
+        var any = false;
+        for(var i = 0; i < trace._length; i += 1) {
+            var pointData = lib.appendArrayPointValue({}, trace, i);
+            var val = lib.nestedProperty(pointData, target).get();
+            array.push(val);
+            any = any || val !== undefined;
+        }
+        return any ? array : false;
     } else if(Array.isArray(target)) {
         return target;
     }
 
     return false;
 };
+
+/** Appends values inside array attributes corresponding to given point number
+ *
+ * @param {object} pointData : point data object (gets mutated here)
+ * @param {object} trace : full trace object
+ * @param {number|Array(number)} pointNumber : point number. May be a length-2 array
+ *     [row, col] to dig into 2D arrays
+ */
+lib.appendArrayPointValue = function(pointData, trace, pointNumber) {
+    var arrayAttrs = trace._arrayAttrs;
+
+    if(!arrayAttrs) {
+        return pointData;
+    }
+
+    for(var i = 0; i < arrayAttrs.length; i++) {
+        var astr = arrayAttrs[i];
+        var key = getPointKey(astr);
+
+        if(pointData[key] === undefined) {
+            var val = lib.nestedProperty(trace, astr).get();
+            var pointVal = getPointData(val, pointNumber);
+
+            if(pointVal !== undefined) pointData[key] = pointVal;
+        }
+    }
+
+    return pointData;
+};
+
+/**
+ * Appends values inside array attributes corresponding to given point number array
+ * For use when pointData references a plot entity that arose (or potentially arose)
+ * from multiple points in the input data
+ *
+ * @param {object} pointData : point data object (gets mutated here)
+ * @param {object} trace : full trace object
+ * @param {Array(number)|Array(Array(number))} pointNumbers : Array of point numbers.
+ *     Each entry in the array may itself be a length-2 array [row, col] to dig into 2D arrays
+ */
+lib.appendArrayMultiPointValues = function(pointData, trace, pointNumbers) {
+    var arrayAttrs = trace._arrayAttrs;
+
+    if(!arrayAttrs) {
+        return pointData;
+    }
+
+    for(var i = 0; i < arrayAttrs.length; i++) {
+        var astr = arrayAttrs[i];
+        var key = getPointKey(astr);
+
+        if(pointData[key] === undefined) {
+            var val = lib.nestedProperty(trace, astr).get();
+            var keyVal = new Array(pointNumbers.length);
+
+            for(var j = 0; j < pointNumbers.length; j++) {
+                keyVal[j] = getPointData(val, pointNumbers[j]);
+            }
+            pointData[key] = keyVal;
+        }
+    }
+
+    return pointData;
+};
+
+var pointKeyMap = {
+    ids: 'id',
+    locations: 'location',
+    labels: 'label',
+    values: 'value',
+    'marker.colors': 'color',
+    parents: 'parent'
+};
+
+function getPointKey(astr) {
+    return pointKeyMap[astr] || astr;
+}
+
+function getPointData(val, pointNumber) {
+    if(Array.isArray(pointNumber)) {
+        if(Array.isArray(val) && Array.isArray(val[pointNumber[0]])) {
+            return val[pointNumber[0]][pointNumber[1]];
+        }
+    } else {
+        return val[pointNumber];
+    }
+}
 
 /**
  * modified version of jQuery's extend to strip out private objs and functions,

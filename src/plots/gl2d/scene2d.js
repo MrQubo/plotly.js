@@ -10,6 +10,8 @@
 'use strict';
 
 var Registry = require('../../registry');
+var Lib = require('../../lib');
+
 var Axes = require('../../plots/cartesian/axes');
 var Fx = require('../../components/fx');
 
@@ -565,7 +567,7 @@ proto.emitPointAction = function(nextSelection, eventType) {
         yaxis: this.yaxis
     };
 
-    Fx.appendArrayPointValue(pointData, trace, ptNumber);
+    Lib.appendArrayPointValue(pointData, trace, ptNumber);
 
     this.graphDiv.emit(eventType, {points: [pointData]});
 };
