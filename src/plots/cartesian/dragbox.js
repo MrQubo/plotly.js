@@ -550,25 +550,22 @@ function makeDragBox(gd, plotinfo, x, y, w, h, ns, ew) {
                 if(axi.fixedrange || axi.boundon !== 'interaction') {
                     continue;
                 }
-                var minpix = pix;
-                var maxpix = pix;
-                if(axi._bl[1] !== null) {
+                var pixBound;
+                if(pix * axi._m >= 0 && axi._bl[0] !== null) {
+                    pixBound = axi._m * Math.min(axi._rl[0] - axi._bl[0], axi._rl[1] - axi._bl[0]);
                     if(axi._m >= 0) {
-                        minpix = axi._m * (axi._rl[1] - axi._bl[1]);
+                        pix = Math.min(pix, pixBound);
                     } else {
-                        maxpix = axi._m * (axi._rl[1] - axi._bl[1]);
+                        pix = Math.max(pix, pixBound);
+                    }
+                } else if(pix * axi._m < 0 && axi._bl[1] !== null) {
+                    pixBound = axi._m * Math.max(axi._rl[0] - axi._bl[1], axi._rl[1] - axi._bl[1]);
+                    if(axi._m >= 0) {
+                        pix = Math.max(pix, pixBound);
+                    } else {
+                        pix = Math.min(pix, pixBound);
                     }
                 }
-                if(axi._bl[0] !== null) {
-                    if(axi._m >= 0) {
-                        maxpix = axi._m * (axi._rl[0] - axi._bl[0]);
-                    } else {
-                        minpix = axi._m * (axi._rl[0] - axi._bl[0]);
-                    }
-                }
-                // DEBUG
-                // console.dir({ axi: { _rl: axi._rl, _bl: axi._bl }, i, pix, minpix, maxpix });
-                pix = Math.min(maxpix, Math.max(minpix, pix));
             }
 
             for(i = 0; i < axList.length; i++) {
@@ -616,13 +613,11 @@ function makeDragBox(gd, plotinfo, x, y, w, h, ns, ew) {
                     continue;
                 }
 
-                var maxd = d;
                 if(d > 0 && axi._bl[end] !== null) {
-                    maxd = dZoomInv((axi._rl[otherEnd] - axi._rl[end]) / (axi._rl[otherEnd] - axi._bl[end])) * axi._length;
+                    var maxd = dZoomInv((axi._rl[otherEnd] - axi._rl[end]) /
+                        (axi._rl[otherEnd] - axi._bl[end])) * axi._length;
+                    d = Math.min(maxd, d);
                 }
-                // DEBUG
-                // console.dir({ axi: { _rl: axi._rl, _bl: axi._bl }, i, d, maxd });
-                d = Math.min(maxd, d);
             }
             for(i = 0; i < axArray.length; i++) {
                 axi = axArray[i];
@@ -634,9 +629,7 @@ function makeDragBox(gd, plotinfo, x, y, w, h, ns, ew) {
 
                 // if l2r comes back false or undefined, it means we've dragged off
                 // the end of valid ranges - so stop.
-                if(newEnd !== false && newEnd !== undefined) {
-                    axi.range[end] = newEnd;
-                }
+                if(newEnd !== false && newEnd !== undefined) axi.range[end] = newEnd;
             }
             return movedAx._length * (movedAx._rl[end] - newLinearizedEnd) /
                 (movedAx._rl[end] - movedAx._rl[otherEnd]);
