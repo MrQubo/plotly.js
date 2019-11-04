@@ -553,10 +553,18 @@ function makeDragBox(gd, plotinfo, x, y, w, h, ns, ew) {
                 var minpix = pix;
                 var maxpix = pix;
                 if(axi._bl[1] !== null) {
-                    minpix = axi._m * (axi._rl[1] - axi._bl[1]);
+                    if(axi._m >= 0) {
+                        minpix = axi._m * (axi._rl[1] - axi._bl[1]);
+                    } else {
+                        maxpix = axi._m * (axi._rl[1] - axi._bl[1]);
+                    }
                 }
                 if(axi._bl[0] !== null) {
-                    maxpix = axi._m * (axi._rl[0] - axi._bl[0]);
+                    if(axi._m >= 0) {
+                        maxpix = axi._m * (axi._rl[0] - axi._bl[0]);
+                    } else {
+                        minpix = axi._m * (axi._rl[0] - axi._bl[0]);
+                    }
                 }
                 // DEBUG
                 // console.dir({ axi: { _rl: axi._rl, _bl: axi._bl }, i, pix, minpix, maxpix });
@@ -609,7 +617,7 @@ function makeDragBox(gd, plotinfo, x, y, w, h, ns, ew) {
                 }
 
                 var maxd = d;
-                if(axi._bl[end] !== null) {
+                if(d > 0 && axi._bl[end] !== null) {
                     maxd = dZoomInv((axi._rl[otherEnd] - axi._rl[end]) / (axi._rl[otherEnd] - axi._bl[end])) * axi._length;
                 }
                 // DEBUG
