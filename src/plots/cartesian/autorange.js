@@ -91,7 +91,6 @@ function getAutoRange(gd, ax) {
     var rangeMode = ax.rangemode;
     var toZero = rangeMode === 'tozero';
     var nonNegative = rangeMode === 'nonnegative';
-    var boundModeAutoRange = ax.boundmode.indexOf('autorange') !== -1;
     var axLen = ax._length;
     // don't allow padding to reduce the data to < 10% of the length
     var minSpan = axLen / 10;
@@ -177,9 +176,7 @@ function getAutoRange(gd, ax) {
         ];
     }
 
-    if(boundModeAutoRange) {
-        newRange = Lib.clampRangeToBounds(newRange, ax.bounds);
-    }
+    newRange = Lib.clampRangeToBounds(newRange, ax.bounds);
 
     // maintain reversal
     if(axReverse) newRange.reverse();

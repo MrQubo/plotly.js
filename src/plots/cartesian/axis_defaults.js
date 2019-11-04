@@ -61,12 +61,8 @@ module.exports = function handleAxisDefaults(containerIn, containerOut, coerce, 
     coerce('range');
     containerOut.cleanRange();
 
-    var bounds = coerce('bounds');
-    var boundmodeDflt = '';
-    if(bounds && (bounds[0] || bounds[1])) {
-        boundmodeDflt = 'autorange+interaction';
-    }
-    coerce('boundmode', boundmodeDflt);
+    coerce('bounds');
+    coerce('boundon');
 
     handleCategoryOrderDefaults(containerIn, containerOut, coerce, options);
 

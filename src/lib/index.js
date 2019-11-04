@@ -1221,7 +1221,7 @@ lib.getTextTransform = function(opts) {
  */
 lib.clampRangeToBounds = function(range, bounds) {
     if(!bounds) {
-        return range;
+        return range.slice();
     }
 
     var r0 = range[0];

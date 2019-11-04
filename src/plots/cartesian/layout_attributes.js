@@ -155,12 +155,12 @@ module.exports = {
     },
     bounds: {
         valType: 'info_array',
-        role: 'info',
         items: [
             {valType: 'any', anim: true},
             {valType: 'any', anim: true}
         ],
         anim: true,
+        role: 'info',
         description: [
             'Sets the bounds of this axis.',
             'If the axis `type` is *log*, then you must take the log of your',
@@ -174,9 +174,10 @@ module.exports = {
             'number from zero in the order it appears.'
         ].join(' ')
     },
-    boundmode: {
-        valType: 'flaglist',
-        flags: ['autorange', 'interaction'],
+    boundon: {
+        valType: 'enumerated',
+        values: ['autorange', 'interaction'],
+        dflt: 'interaction',
         role: 'info',
         description: [
             // TODO
