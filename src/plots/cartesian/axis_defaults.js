@@ -61,7 +61,14 @@ module.exports = function handleAxisDefaults(containerIn, containerOut, coerce, 
     coerce('range');
     containerOut.cleanRange();
 
-    coerce('bounds');
+    // TODO: Set default bounds to full range for categorial axis.
+    var bounds = coerce('bounds');
+    if(!bounds[0] && bounds[0] !== 0) {
+        bounds[0] = null;
+    }
+    if(!bounds[1] && bounds[1] !== 0) {
+        bounds[1] = null;
+    }
     coerce('boundon');
 
     handleCategoryOrderDefaults(containerIn, containerOut, coerce, options);

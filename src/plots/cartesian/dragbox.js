@@ -542,13 +542,48 @@ function makeDragBox(gd, plotinfo, x, y, w, h, ns, ew) {
         // prevent axis drawing from monkeying with margins until we're done
         gd._fullLayout._replotting = true;
 
+        function dragAxList(axList, pix) {
+            var i, axi;
+
+            for(i = 0; i < axList.length; i++) {
+                axi = axList[i];
+                if(axi.fixedrange || axi.boundon !== 'interaction') {
+                    continue;
+                }
+                var minpix = pix;
+                var maxpix = pix;
+                if(axi._bl[1] !== null) {
+                    minpix = axi._m * (axi._rl[1] - axi._bl[1]);
+                }
+                if(axi._bl[0] !== null) {
+                    maxpix = axi._m * (axi._rl[0] - axi._bl[0]);
+                }
+                // DEBUG
+                // console.dir({ axi: { _rl: axi._rl, _bl: axi._bl }, i, pix, minpix, maxpix });
+                pix = Math.min(maxpix, Math.max(minpix, pix));
+            }
+
+            for(i = 0; i < axList.length; i++) {
+                axi = axList[i];
+
+                if(!axi.fixedrange) {
+                    axi.range = [
+                        axi.l2r(axi._rl[0] - pix / axi._m),
+                        axi.l2r(axi._rl[1] - pix / axi._m)
+                    ];
+                }
+            }
+
+            return pix;
+        }
+
         if(xActive === 'ew' || yActive === 'ns') {
             if(xActive) {
-                dragAxList(xaxes, dx);
+                dx = dragAxList(xaxes, dx);
                 updateMatchedAxRange('x');
             }
             if(yActive) {
-                dragAxList(yaxes, dy);
+                dy = dragAxList(yaxes, dy);
                 updateMatchedAxRange('y');
             }
             updateSubplots([xActive ? -dx : 0, yActive ? -dy : 0, pw, ph]);
@@ -566,8 +601,23 @@ function makeDragBox(gd, plotinfo, x, y, w, h, ns, ew) {
             var otherEnd = 1 - end;
             var movedAx;
             var newLinearizedEnd;
-            for(var i = 0; i < axArray.length; i++) {
-                var axi = axArray[i];
+            var i, axi;
+            for(i = 0; i < axArray.length; i++) {
+                axi = axArray[i];
+                if(axi.fixedrange || axi.boundon !== 'interaction') {
+                    continue;
+                }
+
+                var maxd = d;
+                if(axi._bl[end] !== null) {
+                    maxd = dZoomInv((axi._rl[otherEnd] - axi._rl[end]) / (axi._rl[otherEnd] - axi._bl[end])) * axi._length;
+                }
+                // DEBUG
+                // console.dir({ axi: { _rl: axi._rl, _bl: axi._bl }, i, d, maxd });
+                d = Math.min(maxd, d);
+            }
+            for(i = 0; i < axArray.length; i++) {
+                axi = axArray[i];
                 if(axi.fixedrange) continue;
                 movedAx = axi;
                 newLinearizedEnd = axi._rl[otherEnd] +
@@ -576,7 +626,9 @@ function makeDragBox(gd, plotinfo, x, y, w, h, ns, ew) {
 
                 // if l2r comes back false or undefined, it means we've dragged off
                 // the end of valid ranges - so stop.
-                if(newEnd !== false && newEnd !== undefined) axi.range[end] = newEnd;
+                if(newEnd !== false && newEnd !== undefined) {
+                    axi.range[end] = newEnd;
+                }
             }
             return movedAx._length * (movedAx._rl[end] - newLinearizedEnd) /
                 (movedAx._rl[end] - movedAx._rl[otherEnd]);
@@ -999,24 +1051,6 @@ function zoomAxRanges(axList, r0Fraction, r1Fraction, updates, linkedAxes) {
     }
 }
 
-function dragAxList(axList, pix) {
-    for(var i = 0; i < axList.length; i++) {
-        var axi = axList[i];
-
-        if(!axi.fixedrange) {
-            axi.range = [
-                axi.l2r(axi._rl[0] - pix / axi._m),
-                axi.l2r(axi._rl[1] - pix / axi._m)
-            ];
-        }
-
-        // TODO: Calculate max/min possible dx/dy and clamp it in plotDrag().
-        if(axi.boundon === 'interaction') {
-            axi.range = Lib.clampRangeToBounds(axi.range, axi.bounds);
-        }
-    }
-}
-
 // common transform for dragging one end of an axis
 // d>0 is compressing scale (cursor is over the plot,
 //  the axis end should move with the cursor)
@@ -1025,6 +1059,14 @@ function dragAxList(axList, pix) {
 function dZoom(d) {
     return 1 - ((d >= 0) ? Math.min(d, 0.9) :
         1 / (1 / Math.max(d, -0.3) + 3.222));
+}
+
+function dZoomInv(v) {
+    if (v >= 0) {
+        return 1 - v;
+    } else if (v < 0) {
+        return (v - 1) / (3.222 - 1 - 3.222 * v);
+    }
 }
 
 function getDragCursor(nsew, dragmode, isMainDrag) {

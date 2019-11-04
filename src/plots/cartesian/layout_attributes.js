@@ -159,6 +159,7 @@ module.exports = {
             {valType: 'any', anim: true},
             {valType: 'any', anim: true}
         ],
+        dflt: [null, null],
         anim: true,
         role: 'info',
         description: [
@@ -171,7 +172,8 @@ module.exports = {
             'will be accepted and converted to strings.',
             'If the axis `type` is *category*, it should be numbers,',
             'using the scale where each category is assigned a serial',
-            'number from zero in the order it appears.'
+            'number from zero in the order it appears.',
+            'If range is reversed bounds should be reversed as well.'
         ].join(' ')
     },
     boundon: {

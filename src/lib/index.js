@@ -1240,8 +1240,8 @@ lib.clampRangeToBounds = function(range, bounds) {
     }
 
     var dr = r1 - r0;
-    var hasB0 = b0 || b0 === 0;
-    var hasB1 = b1 || b1 === 0;
+    var hasB0 = b0 !== null;
+    var hasB1 = b1 !== null;
 
     if(hasB0 && hasB1) {
         var db = b1 - b0;
