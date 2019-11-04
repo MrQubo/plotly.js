@@ -244,7 +244,7 @@ function handleCartesian(gd, ev) {
                     ];
                     // TODO: Move it directly to range setting code
                     if(ax.boundon === 'interaction') {
-                        rangeNew = Lib.clampRangeToBounds(rangeNew, ax.bounds);
+                        rangeNew = Lib.clampRangeToBounds(rangeNew, ax._bl);
                     }
 
                     aobj[axName + '.range[0]'] = ax.l2r(rangeNew[0]);

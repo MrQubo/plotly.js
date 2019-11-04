@@ -1212,6 +1212,18 @@ lib.getTextTransform = function(opts) {
 };
 
 /**
+ * Wrap `f` to return result of f if argument isn't null and null otherwise.
+ * @param {function} f function to wrap.
+ * @return {function} wrapped `f` function.
+ */
+lib.nullableBind = function(f) {
+    return function(v) {
+        if(v === null) { return v; }
+        return f(v);
+    };
+};
+
+/**
  * Clamps a given range to the bounds specified.
  * @param {array} range to clamp to the bounds.
  * @param {array} bounds to clamp to.

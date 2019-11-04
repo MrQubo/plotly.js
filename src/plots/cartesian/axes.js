@@ -1623,16 +1623,9 @@ axes.draw = function(gd, arg, opts) {
             var ax = axes.getFromId(gd, axId);
             var axDone = axes.drawOne(gd, ax, opts);
 
-            function nullable(f) {
-                return function(v) {
-                    if(v === null) { return v; }
-                    return f(v);
-                };
-            }
-
             ax._r = ax.range.slice();
             ax._rl = Lib.simpleMap(ax._r, ax.r2l);
-            ax._bl = Lib.simpleMap(ax.bounds, nullable(ax.r2l));
+            ax._bl = Lib.simpleMap(ax.bounds, Lib.nullableBind(ax.r2l));
 
             return axDone;
         };

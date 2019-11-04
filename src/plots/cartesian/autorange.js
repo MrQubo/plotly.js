@@ -176,7 +176,7 @@ function getAutoRange(gd, ax) {
         ];
     }
 
-    newRange = Lib.clampRangeToBounds(newRange, ax.bounds);
+    newRange = Lib.clampRangeToBounds(newRange, ax._bl);
 
     // maintain reversal
     if(axReverse) newRange.reverse();
@@ -238,6 +238,8 @@ function doAutoRange(gd, ax) {
     ax.setScale();
 
     if(ax.autorange) {
+        ax._bl = Lib.simpleMap(ax.bounds, Lib.nullableBind(ax.r2l));
+
         ax.range = getAutoRange(gd, ax);
 
         ax._r = ax.range.slice();
