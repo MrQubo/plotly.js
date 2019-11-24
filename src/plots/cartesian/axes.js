@@ -1625,6 +1625,7 @@ axes.draw = function(gd, arg, opts) {
 
             ax._r = ax.range.slice();
             ax._rl = Lib.simpleMap(ax._r, ax.r2l);
+            ax._bl = Lib.simpleMap(ax.bounds, Lib.nullableBind(ax.r2l));
 
             return axDone;
         };

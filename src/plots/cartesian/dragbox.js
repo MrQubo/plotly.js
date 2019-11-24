@@ -542,13 +542,53 @@ function makeDragBox(gd, plotinfo, x, y, w, h, ns, ew) {
         // prevent axis drawing from monkeying with margins until we're done
         gd._fullLayout._replotting = true;
 
+        function dragAxList(axList, pix) {
+            var i, axi;
+
+            for(i = 0; i < axList.length; i++) {
+                axi = axList[i];
+                if(axi.fixedrange || axi.boundon !== 'interaction') {
+                    continue;
+                }
+                var pixBound;
+                if(pix * axi._m >= 0 && axi._bl[0] !== null) {
+                    pixBound = axi._m * Math.min(axi._rl[0] - axi._bl[0], axi._rl[1] - axi._bl[0]);
+                    if(axi._m >= 0) {
+                        pix = Math.min(pix, pixBound);
+                    } else {
+                        pix = Math.max(pix, pixBound);
+                    }
+                } else if(pix * axi._m < 0 && axi._bl[1] !== null) {
+                    pixBound = axi._m * Math.max(axi._rl[0] - axi._bl[1], axi._rl[1] - axi._bl[1]);
+                    if(axi._m >= 0) {
+                        pix = Math.max(pix, pixBound);
+                    } else {
+                        pix = Math.min(pix, pixBound);
+                    }
+                }
+            }
+
+            for(i = 0; i < axList.length; i++) {
+                axi = axList[i];
+
+                if(!axi.fixedrange) {
+                    axi.range = [
+                        axi.l2r(axi._rl[0] - pix / axi._m),
+                        axi.l2r(axi._rl[1] - pix / axi._m)
+                    ];
+                }
+            }
+
+            return pix;
+        }
+
         if(xActive === 'ew' || yActive === 'ns') {
             if(xActive) {
-                dragAxList(xaxes, dx);
+                dx = dragAxList(xaxes, dx);
                 updateMatchedAxRange('x');
             }
             if(yActive) {
-                dragAxList(yaxes, dy);
+                dy = dragAxList(yaxes, dy);
                 updateMatchedAxRange('y');
             }
             updateSubplots([xActive ? -dx : 0, yActive ? -dy : 0, pw, ph]);
@@ -566,8 +606,21 @@ function makeDragBox(gd, plotinfo, x, y, w, h, ns, ew) {
             var otherEnd = 1 - end;
             var movedAx;
             var newLinearizedEnd;
-            for(var i = 0; i < axArray.length; i++) {
-                var axi = axArray[i];
+            var i, axi;
+            for(i = 0; i < axArray.length; i++) {
+                axi = axArray[i];
+                if(axi.fixedrange || axi.boundon !== 'interaction') {
+                    continue;
+                }
+
+                if(d > 0 && axi._bl[end] !== null) {
+                    var maxd = dZoomInv((axi._rl[otherEnd] - axi._rl[end]) /
+                        (axi._rl[otherEnd] - axi._bl[end])) * axi._length;
+                    d = Math.min(maxd, d);
+                }
+            }
+            for(i = 0; i < axArray.length; i++) {
+                axi = axArray[i];
                 if(axi.fixedrange) continue;
                 movedAx = axi;
                 newLinearizedEnd = axi._rl[otherEnd] +
@@ -999,18 +1052,6 @@ function zoomAxRanges(axList, r0Fraction, r1Fraction, updates, linkedAxes) {
     }
 }
 
-function dragAxList(axList, pix) {
-    for(var i = 0; i < axList.length; i++) {
-        var axi = axList[i];
-        if(!axi.fixedrange) {
-            axi.range = [
-                axi.l2r(axi._rl[0] - pix / axi._m),
-                axi.l2r(axi._rl[1] - pix / axi._m)
-            ];
-        }
-    }
-}
-
 // common transform for dragging one end of an axis
 // d>0 is compressing scale (cursor is over the plot,
 //  the axis end should move with the cursor)
@@ -1019,6 +1060,14 @@ function dragAxList(axList, pix) {
 function dZoom(d) {
     return 1 - ((d >= 0) ? Math.min(d, 0.9) :
         1 / (1 / Math.max(d, -0.3) + 3.222));
+}
+
+function dZoomInv(v) {
+    if (v >= 0) {
+        return 1 - v;
+    } else if (v < 0) {
+        return (v - 1) / (3.222 - 1 - 3.222 * v);
+    }
 }
 
 function getDragCursor(nsew, dragmode, isMainDrag) {

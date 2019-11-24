@@ -153,6 +153,38 @@ module.exports = {
             'number from zero in the order it appears.'
         ].join(' ')
     },
+    bounds: {
+        valType: 'info_array',
+        items: [
+            {valType: 'any', anim: true},
+            {valType: 'any', anim: true}
+        ],
+        dflt: [null, null],
+        anim: true,
+        role: 'info',
+        description: [
+            'Sets the bounds of this axis.',
+            'If the axis `type` is *log*, then you must take the log of your',
+            'desired bounds (e.g. to set the bounds from 1 to 100,',
+            'set the bounds from 0 to 2).',
+            'If the axis `type` is *date*, it should be date strings,',
+            'like date data, though Date objects and unix milliseconds',
+            'will be accepted and converted to strings.',
+            'If the axis `type` is *category*, it should be numbers,',
+            'using the scale where each category is assigned a serial',
+            'number from zero in the order it appears.',
+            'If range is reversed bounds should be reversed as well.'
+        ].join(' ')
+    },
+    boundon: {
+        valType: 'enumerated',
+        values: ['autorange', 'interaction'],
+        dflt: 'interaction',
+        role: 'info',
+        description: [
+            // TODO
+        ].join(' ')
+    },
     fixedrange: {
         valType: 'boolean',
         dflt: false,
